@@ -1,0 +1,162 @@
+#include <iostream>
+#include <queue>
+using namespace std;
+
+class node{
+    node* next;
+    int val;
+
+    public:
+    node(int val){
+        this->val = val;
+        this->next = NULL;
+    }
+    friend class Graph;
+
+};
+
+class Graph{
+    node* adjList[20];
+    int ver, edges;
+
+    public:
+
+    Graph(int ver){
+        this->ver = ver;
+        for(int i=0;i<ver;i++){
+            this->adjList[i] = new node(i);
+        }
+    }
+
+    void create(int edges){
+        int s,d;
+        this->edges = edges;
+        for(int i=0;i<edges;i++){
+
+            cout<<"Enter the edge number  "<<i+1<<"  : "<<endl;
+            cout<<"Enter source vertex : ";cin>>s;
+            cout<<"Enter destination vertex : ";cin>>d;
+
+            node* tmp = this->adjList[s];
+            while(tmp->next){
+                tmp = tmp->next;
+            }
+            tmp->next = new node(d);
+
+            tmp = this->adjList[d];
+            while(tmp->next){
+                tmp = tmp->next;
+            }
+            tmp->next = new node(s);
+        }
+    }
+
+    void display(){
+        for(int i=0; i<this->ver; i++){
+            cout<<i<<" -> ";
+            node* tmp = this->adjList[i]->next;
+            while(tmp){
+                cout<<tmp->val<<" ";
+                tmp = tmp->next;
+            }
+            cout<<endl;
+        }
+    }
+    void bfsHelper(queue<int> q,vector<bool> vis){
+        if(q.empty()) return;
+        int top = q.front();
+        q.pop();
+        cout<<top<<" ";
+         for(node* i=adjList[top]; i != NULL; i = i->next){
+                if(vis[i->val] == 0){
+                    q.push(i->val);
+                    vis[i->val] = 1;
+                }
+            }
+        bfsHelper(q,vis);
+    }
+
+    void bfsRecursive(int src){
+        queue<int> q;
+        q.push(src);
+        vector<bool> vis(20,0);
+        vis[src]=1;
+        bfsHelper(q,vis);
+    }
+
+    void BFS(int n){
+        queue<int> q;
+        int vis[20] = {0};
+        q.push(n);
+        vis[n] = 1;
+        while(!q.empty()){
+            int tmp = q.front();
+            q.pop();
+            cout<<tmp<<" ";
+            for(node* i=adjList[tmp]; i != NULL; i = i->next){
+                if(vis[i->val] == 0){
+                    q.push(i->val);
+                    vis[i->val] = 1;
+                }
+            }
+        }
+    }
+
+    void DFS_trav(int n,int vis[]){
+        cout<<n<<" ";
+        vis[n] = 1;
+        for(node* tmp=adjList[n]; tmp!=NULL; tmp = tmp->next){
+            if(vis[tmp->val] == 0){
+                DFS_trav(tmp->val,vis);
+            }
+        }
+       
+    }
+
+    void DFS(int n){
+        int vis[20] = {0};
+        DFS_trav(n,vis);
+    }
+
+
+
+
+};
+
+
+int main(){
+    int opt,n;
+    cout<<"Enter number of vertices : ";cin>>n;
+    Graph g(n);
+    while(1){
+        cout<<"\n1.Create\n2.Display\n3.BFS\n4.DFS\n5.Recursive BFS\n\nEnter your choice : ";
+        cin>>opt;
+        if(opt == 1){
+            cout<<"Enter number of edges : ";cin>>n;
+            g.create(n);
+        }
+        else if(opt == 2){
+            g.display();
+        }
+        else if(opt == 3){
+            int val;
+            cout<<"Enter the source vertex : ";cin>>val;
+            g.BFS(val);
+        }
+        
+        else if(opt == 4){
+            int val;
+            cout<<"Enter the source vertex : ";cin>>val;
+            g.DFS(val);
+        }
+        else if(opt == 5){
+            int val;
+            cout<<"Enter the source vertex : ";cin>>val;
+            g.bfsRecursive(val);
+        }
+        else{
+            break;
+        }
+    }
+
+}

@@ -1,0 +1,121 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+using namespace std;
+
+class node{
+    node* next;
+    int val;
+    int wt;
+
+    public:
+    node(int val,int wt){
+        this->val = val;
+        this->next = NULL;
+        this->wt = wt;
+    }
+    friend class Graph;
+
+};
+
+class Graph{
+    node* adjList[20];
+    int ver, edges;
+
+    public:
+
+    Graph(int ver){
+        this->ver = ver;
+        for(int i=0;i<ver;i++){
+            this->adjList[i] = new node(i,0);
+        }
+    }
+
+    void create(int edges){
+        int s,d,wt;
+        this->edges = edges;
+        for(int i=0;i<edges;i++){
+
+            cout<<"Enter the edge number  "<<i+1<<"  -> "<<endl;
+            cout<<"Enter source vertex : ";cin>>s;
+            cout<<"Enter destination vertex : ";cin>>d;
+            cout<<"Enter the weight : ";cin>>wt;
+            cout<<endl;
+
+            node* tmp = this->adjList[s];
+            while(tmp->next){
+                tmp = tmp->next;
+            }
+            tmp->next = new node(d,wt);
+
+            tmp = this->adjList[d];
+            while(tmp->next){
+                tmp = tmp->next;
+            }
+            tmp->next = new node(s,wt);
+        }
+    }
+
+    void display(){
+        for(int i=0; i<this->ver; i++){
+            cout<<i<<" -> ";
+            node* tmp = this->adjList[i]->next;
+            while(tmp){
+                cout<<tmp->val<<" ";
+                tmp = tmp->next;
+            }
+            cout<<endl;
+        }
+    }
+
+    void Prims(){
+        int n = this->ver;
+        vector<int> key(n,INT_MAX);
+        vector<int> parent(n,-1);
+        vector<bool> MST(n,false);
+        key[0] = 0;
+        parent[0] = -1;
+
+        for(int i=0;i<n-1;i++){
+            int mini = INT_MAX;
+            int k=0;
+            for(int j=0;j<n;j++){
+                if(MST[j] == false && key[j]<mini){
+                    k = j;
+                    mini = key[j];
+                }
+            }
+
+            MST[k] = true;
+            node* tmp = adjList[k]->next;
+            while(tmp){
+                if(MST[tmp->val] == false && tmp->wt < key[tmp->val]){
+                    parent[tmp->val] = k;
+                    key[tmp->val] = tmp->wt;
+                }
+                tmp = tmp->next;
+            }  
+        }
+
+        for(int i=0;i<n;i++){
+            cout<<i<<"  ->  "<<parent[i]<<endl;
+        }
+
+    }
+
+};
+
+int main(){
+    int opt,n;
+    cout<<"Enter number of vertices : ";cin>>n;
+
+    Graph g(n);
+
+    cout<<"Enter number of edges : ";cin>>n;
+    g.create(n);
+
+    g.Prims();
+
+
+
+}

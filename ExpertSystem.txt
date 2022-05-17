@@ -1,0 +1,39 @@
+print('\n\tWelcome to Employee Perfomance Evauation Expert system')
+
+scoreCnt=0
+
+print()
+questionSet=["Arrives for work on time","Arrives for meetings on time","Meets work deadlines",
+"Identifies problems and Proposes solutions to problems","Uses office hrs effectivly",
+"Possess required job skills","Consults with supervisors and coworkers as necessary",
+"Demonstrates effective leadership skills as appropriate","Positive atitude towards job and company",
+"Deals effectively and professionally with employees in other areas","Responds appropriately to"
+ "feedback on job performance"]
+for i in range(11):
+    print(questionSet[i])
+    print()
+    ans=input()
+    if(ans=="E" or "e"):
+        scoreCnt+=1
+    elif(ans=="D" or "d"):
+        scoreCnt+=2
+    elif(ans=="C" or "c"):
+        scoreCnt+=3
+    elif(ans=="B" or "b"):
+        scoreCnt+=4
+    elif(ans=="A" or "a"):
+        scoreCnt+=5
+    elif(ans=="NA" or "na"):
+        continue
+        
+print("Evaluation score: ",scoreCnt)
+if(scoreCnt<=5):
+    print("Poor Performer!")
+elif(scoreCnt>5 and scoreCnt<=10):
+    print("Average Performer!")
+elif(scoreCnt>10 and scoreCnt<=15):
+    print("Good Performer!")
+elif(scoreCnt>15 and scoreCnt<=20):
+    print("very Good Performer!")
+elif(scoreCnt>25):
+    print("Exellent Performer!")

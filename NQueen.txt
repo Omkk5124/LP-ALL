@@ -1,0 +1,227 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+#define size 20
+
+// function for printing the board
+void displayBoard(int board[size][size], int n)
+{
+    for (int row = 0; row < n; row++)
+    {
+        for (int col = 0; col < n; col++)
+            cout << " " << board[row][col];
+        cout << "\n";
+    }
+}
+
+// function to check if queen can be placed on board[row][col] for branch and bound
+bool checkPosition_branch(int row, int col, int normalDiagnol[size][size],
+                          int reverseDiagnol[size][size], bool rowLook[],
+                          bool normalDiagnolLook[], bool reverseDiagnolLook[])
+{
+    // check for digonal and columns position
+    if (normalDiagnolLook[normalDiagnol[row][col]] ||
+        reverseDiagnolLook[reverseDiagnol[row][col]] ||
+        rowLook[row])
+        return false;
+
+    return true;
+}
+
+// A recursive utility function to solve N Queen problem using branch and bound
+bool solveNQueensUtil_branch(int board[size][size], int col,
+                             int normalDiagnol[size][size], int reverseDiagnol[size][size],
+                             bool rowLook[size],
+                             bool normalDiagnolLook[],
+                             bool reverseDiagnolLook[], int n)
+{
+    // If all queens are placed return true
+
+    if (col >= n)
+        return true;
+
+    // placing queens row by row
+    for (int i = 0; i < n; i++)
+    {
+        // check for board[i][col] position
+        if (checkPosition_branch(i, col, normalDiagnol,
+                                 reverseDiagnol, rowLook,
+                                 normalDiagnolLook, reverseDiagnolLook))
+        {
+            // if position is safe then place queen at board[i][col]
+            board[i][col] = 1;
+            rowLook[i] = true;
+            normalDiagnolLook[normalDiagnol[i][col]] = true;
+            reverseDiagnolLook[reverseDiagnol[i][col]] = true;
+
+            // call solveNQueenUtil for rest of the queens
+            if (solveNQueensUtil_branch(board, col + 1,
+                                        normalDiagnol, reverseDiagnol,
+                                        rowLook, normalDiagnolLook, reverseDiagnolLook, n))
+                return true;
+
+            // If placing queen in board[i][col] doesn't lead to a solution, then backtrack
+
+            // Remove queen from board[i][col]
+            board[i][col] = 0;
+
+            // make digonals and column position false
+            rowLook[i] = false;
+            normalDiagnolLook[normalDiagnol[i][col]] = false;
+            reverseDiagnolLook[reverseDiagnol[i][col]] = false;
+        }
+    }
+
+    /* If queen can not be place in any row in
+        this column col then return false */
+    return false;
+}
+
+// function to solve n queen problem using branch and bound
+bool solveNQueens_branch(int n)
+{
+    int board[size][size] = {0};
+
+    // matrix  for checking diagonal positions
+    int normalDiagnol[size][size];
+    int reverseDiagnol[size][size];
+
+    // arrays to tell which rows are occupied
+    bool rowLook[size] = {false};
+
+    // arrays to check which diagonals are occupied
+
+    // for checking top-left_bottom-right diagnol positions
+    bool normalDiagnolLook[2 * size - 1] = {false};
+
+    // for checking top-right_bottom-left diagnol positions
+    bool reverseDiagnolLook[2 * size - 1] = {false};
+
+    // initializing the arrays
+    for (int r = 0; r < n; r++)
+        for (int c = 0; c < n; c++)
+        {
+            normalDiagnol[r][c] = r + c,
+            reverseDiagnol[r][c] = r - c + 7;
+        }
+
+    if (solveNQueensUtil_branch(board, 0,
+                                normalDiagnol, reverseDiagnol,
+                                rowLook, normalDiagnolLook, reverseDiagnolLook, n) ==
+        false)
+    {
+
+        cout << "Solution does not exist";
+        return false;
+    }
+
+    // if solution found print
+    displayBoard(board, n);
+    return true;
+}
+
+// function to check if queen can be placed on board[row][col]
+bool checkPosition_backtrack(int board[size][size], int row, int col, int n)
+{
+    int i, j;
+
+    // Checking this row on left side
+    for (i = 0; i < col; i++)
+        if (board[row][i])
+            return false;
+
+    // Checking upper diagonal on left side
+    for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
+        if (board[i][j])
+            return false;
+
+    // Checking lower diagonal on left side
+    for (i = row, j = col; j >= 0 && i < n; i++, j--)
+        if (board[i][j])
+            return false;
+
+    return true;
+}
+
+/* A recursive utility function to solve N
+Queen problem  using backtracking*/
+bool solveNQueensUtil_backtrack(int board[size][size], int col, int n)
+{
+    // If all queens are placed then return true
+    if (col >= n)
+        return true;
+
+    // placing queens row by row
+    for (int i = 0; i < n; i++)
+    {
+        // Check if the queen can be placed on board[i][col]
+        if (checkPosition_backtrack(board, i, col, n))
+        {
+            // Place this queen in board[i][col]
+            board[i][col] = 1;
+
+            // call solveNQueensUtil_backtrack for rest of the queens
+            if (solveNQueensUtil_backtrack(board, col + 1, n))
+                return true;
+
+            /* If placing queen in board[i][col]
+            doesn't lead to a solution, then
+            remove queen from board[i][col] */
+            board[i][col] = 0; // BACKTRACK
+        }
+    }
+
+    /* If the queen cannot be placed in any row in
+        this column col then return false */
+    return false;
+}
+
+// This function solves the N Queen problem using Backtracking.
+bool solveNQueens_backtrack(int n)
+{
+    int board[size][size] = {0};
+
+    if (solveNQueensUtil_backtrack(board, 0, n) == false)
+    {
+        printf("Solution does not exist");
+        return false;
+    }
+
+    displayBoard(board, n);
+    return true;
+}
+int main()
+{
+    int ch, n;
+    while (true)
+    {
+        cout << "\n\nEnter your choice:\n1.Enter no. of queens to be placed\n2.Solve n queen problem using branch and bound\n3.Solve N queen problem using backtracking\n4.Exit\n\n";
+        cin >> ch;
+        if (ch == 1)
+        {
+            cout << "Enter no. of queens to be placed:" << endl;
+            cin >> n;
+        }
+        else if (ch == 2)
+        {
+            cout << "Solution of N-queen problem using branch and bound: " << endl;
+            solveNQueens_branch(n);
+        }
+        else if (ch == 3)
+        {
+            cout << "Solution of N-queen problem using backtracking: " << endl;
+            solveNQueens_backtrack(n);
+        }
+        else if (ch == 4)
+        {
+            cout << "Exiting...." << endl;
+            exit(0);
+        }
+        else
+        {
+            cout << "Please enter valid choice!!" << endl;
+        }
+    }
+
+    return 0;
+}
